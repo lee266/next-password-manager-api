@@ -1,0 +1,12 @@
+[
+  {
+    "model": "app.User",
+    "pk": 1,
+    "fields": {
+      "name": "Lee",
+      "email": "r.ishihara.grune@gmail.com",
+      "password": "2001jhkh",
+      "created_at": "2019-06-04"
+    }
+  }
+]
