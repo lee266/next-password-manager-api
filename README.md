@@ -7,3 +7,6 @@ python update
 
 seeder
 - python3 manage.py post_initial.json
+
+your first time please do under code
+- python3 manage.py createsuperuser
