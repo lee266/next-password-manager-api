@@ -94,4 +94,15 @@ class Task(models.Model):
   
   def __str__(self):
     return self.task
+
+class Calendar(models.Model):
+  title = models.TextField(max_length=2000)
+  user = models.ForeignKey(User, on_delete=models.CASCADE)
+  start = models.DateTimeField()
+  end = models.DateTimeField()
+  all_day = models.BooleanField(default=False)
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now=True)
   
+  def _str__(self):
+    return self.title

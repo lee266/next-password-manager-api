@@ -4,8 +4,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http.response import JsonResponse
-from app.models import User, Message, PasswordManage, Task
-from app.api.serializers import UserSerializer, MessageSerializer, PasswordManageSerializer, TaskSerializer
+from app.models import User, Message, PasswordManage, Task, Calendar
+from app.api.serializers import UserSerializer, MessageSerializer, PasswordManageSerializer, TaskSerializer, CalendarSerializer
 
 class UserView(generics.ListCreateAPIView):
   queryset = User.objects.all()
@@ -29,6 +29,11 @@ class PasswordManageView(generics.ListCreateAPIView):
 class TaskViewSet(viewsets.ModelViewSet):
   queryset = Task.objects.all()
   serializer_class = TaskSerializer
+  permission_classes = (AllowAny,)
+
+class CalendarViewSet(viewsets.ModelViewSet):
+  queryset = Calendar.objects.all()
+  serializer_class = CalendarSerializer
   permission_classes = (AllowAny,)
 
 

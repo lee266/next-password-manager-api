@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from app.models import User, Message, PasswordManage, Task
+from app.models import User, Message, PasswordManage, Task, Calendar
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -31,6 +31,12 @@ class TaskSerializer(serializers.ModelSerializer):
   class Meta:
     model = Task
     fields = '__all__'
+
+class CalendarSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Calendar
+    fields = '__all__'
+    read_only_fields = ('id',)
     
 
     
