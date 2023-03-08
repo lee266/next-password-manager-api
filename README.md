@@ -1,3 +1,5 @@
+# Commands
+
 if you want join django
 - docker exec -it  password_django sh
 

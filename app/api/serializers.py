@@ -1,12 +1,14 @@
 from rest_framework import serializers
-from app.models import User, Message, PasswordManage, Task
+from app.models import User, Message, PasswordManage, Task, Calendar
 
 
 class UserSerializer(serializers.ModelSerializer):
   class Meta:
     model = User
     fields = ('id', 'username', 'email', 'password')
-    extra_kwargs = {'password': {'write_only': True, 'required': True}}
+    extra_kwargs = {'password': {'write_only': True, 'required': True},
+                    'email': {'write_only': True, 'required': True}
+                    }
     
   def create(self, validated_data):
     user = User.objects.create_user(**validated_data)
@@ -31,6 +33,12 @@ class TaskSerializer(serializers.ModelSerializer):
   class Meta:
     model = Task
     fields = '__all__'
+
+class CalendarSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Calendar
+    fields = '__all__'
+    read_only_fields = ('id',)
     
 
     
