@@ -20,6 +20,7 @@ class MessageView(generics.ListCreateAPIView):
 class UserViewSet(viewsets.ModelViewSet):
   queryset = User.objects.all()
   serializer_class = UserSerializer
+  permission_classes = (AllowAny,)
 
 class PasswordManageView(generics.ListCreateAPIView):
   queryset = PasswordManage.objects.all()
