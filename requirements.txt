@@ -1,12 +1,12 @@
-Django>=4.0,<4.2
-djangorestframework
+Django==3.2.10
 psycopg2-binary>=2.8
-mysqlclient
+djangorestframework==3.12.4
+djangorestframework-simplejwt==5.2.2
 django-cors-headers
-djangorestframework-simplejwt
+djoser>==2.1.0
+mysqlclient
 PyJWT
 python-decouple
-djoser
 dj-database-url
 dj_static
 

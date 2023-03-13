@@ -1,0 +1,14 @@
+{% endblock subject %}
+
+{% block text_body %}
+{{name}}様
+
+弊社のサービスをご利用いただきまして、誠にありがとうございます。
+
+以下のリンクから本登録を完了してください。
+{{ protocl }}://{{ domain }}/{{ url|safe }}
+
+本登録頂くことで、弊社のサービスのすべての機能がご利用頂けます。
+
+
+{% endblock text_body %}
