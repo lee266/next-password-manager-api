@@ -2,6 +2,7 @@ from django.urls import path
 from django.conf.urls import include
 from rest_framework import routers
 from app.api import views
+# from djoser.views import PasswordResetView, PasswordResetConfirmView
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet, basename="users")
