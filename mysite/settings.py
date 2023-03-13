@@ -10,14 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from dotenv import load_dotenv
 from pathlib import Path
-import os
 
 from datetime import timedelta
 from decouple import config
 from dj_database_url import parse as dburl
 
+# Loading environment values from .env 
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -38,12 +39,12 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "127.0.0.1:8000",
-    "http://127.0.0.1:3000"]
+    "http://127.0.0.1:3000"
+]
 
 AUTH_USER_MODEL = 'app.User'
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -77,9 +78,39 @@ CORS_ORIGIN_WHITELIST = (
 CORS_ALLOW_CREDENTIALS = True
 WHITENOISE_ALLOW_ALL_ORIGINS = True
 
+# Email setting
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ['EMAIL_HOST']
+EMAIL_PORT = os.environ['EMAIL_PORT']
+EMAIL_USE_TLS = os.environ['EMAIL_USE_TLS']
+EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
+DEFAULT_FROM_EMAIL = os.environ['DEFAULT_FROM_EMAIL']
+
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': 'username/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '/activate/{uid}/{token}',
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
+    'PASSWORD_RESET_CONFIRM_RETYPE': True,
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'SERIALIZERS': {
+        'user_create': 'app.api.serializers.UserSerializer',
+        'user': 'app.api.serializers.UserSerializer',
+        'current_user': 'app.api.serializers.UserSerializer'
+    },
+    'EMAIL': {
+        'password_reset': 'app.email.PasswordResetEmail',
+        'password_changed_confirmation': 'app.email.PasswordChangedConfirmationEmail',
+    }
+}
+
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'BLACKLIST_AFTER_ROTATION': False
 }
@@ -93,7 +124,6 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
-
 
 ROOT_URLCONF = 'mysite.urls'
 
