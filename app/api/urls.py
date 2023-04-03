@@ -6,7 +6,7 @@ from app.api import views
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet, basename="users")
-# router.register(r'passwords', views.PasswordManageView, basename="passwords")
+router.register(r'passwords', views.PasswordManageViewSet, basename="passwords")
 router.register(r'tasks', views.TaskViewSet, basename="tasks")
 router.register(r'calendars', views.CalendarViewSet, basename="calendars")
 
