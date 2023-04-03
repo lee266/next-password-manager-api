@@ -1,6 +1,6 @@
 from rest_framework import generics, viewsets, status
-from rest_framework.permissions import AllowAny
-from rest_framework.decorators import api_view
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http.response import JsonResponse
@@ -22,6 +22,30 @@ class UserViewSet(viewsets.ModelViewSet):
   queryset = User.objects.all()
   serializer_class = UserSerializer
   permission_classes = (AllowAny,)
+
+class PasswordManageViewSet(viewsets.ModelViewSet):
+  serializer_class = PasswordManageSerializer
+  queryset = PasswordManage.objects.all()
+  permission_classes = [IsAuthenticated]
+  
+  @action(detail=False, methods=['get'])
+  def columns(self):
+    serializer = self.get_serializer()
+    columns = [field for field in serializer.fields.keys()]
+    return Response(columns)
+  
+  @action(detail=False, methods=['post'])
+  def search(self, request):
+    print("request",request.data)
+    userID = request.data["id"]
+    queryset = self.get_queryset().filter(user_id=userID)
+    serializer = self.get_serializer(queryset, many=True)
+    print("userID:",request.data["id"])
+    print("queryset:",queryset)
+    print("serializer:",serializer)
+    return Response(serializer.data)
+
+  
 
 class PasswordManageView(generics.ListCreateAPIView):
   queryset = PasswordManage.objects.all()

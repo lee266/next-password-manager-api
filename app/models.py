@@ -5,7 +5,7 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.utils.translation import gettext_lazy as _
 
-# Create your models here.
+
 class UserManager(BaseUserManager):
   use_in_migrations = True
   
@@ -80,9 +80,12 @@ class Message(models.Model):
 
 class PasswordManage(models.Model):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
-  title = models.TextField(max_length=255, blank=True)
+  title = models.CharField(max_length=255, blank=True)
   password = models.TextField()
   email = models.EmailField(blank=True, null=True)
+  website = models.URLField(blank=True)
+  notes = models.TextField(blank=True)
+  tags = models.CharField(max_length=255, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
   
   def __str__(self):
