@@ -5,7 +5,14 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.utils.translation import gettext_lazy as _
 
+"""_summary_
+  Naming convention:
+      class: UpperCamelCase
+      field: snakeCase
 
+  Returns:
+      _type_: _description_
+"""
 class UserManager(BaseUserManager):
   use_in_migrations = True
   
@@ -77,6 +84,49 @@ class Message(models.Model):
   def __str__(self):
     return self.Message
 
+class PasswordGroup(models.Model):
+  user = models.ForeignKey(User, on_delete=models.CASCADE)
+  group_name = models.CharField(max_length=255)
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now=True)
+  
+  class Meta :
+    constraints = [
+      models.UniqueConstraint(
+        fields=["user", "group_name"],
+        name="group_unique"
+      )
+    ]
+  
+  def __str__(self):
+    return self.group_name
+
+
+class PasswordTag(models.Model):
+  user = models.ForeignKey(User, on_delete=models.CASCADE)
+  tag_name = models.CharField(max_length=255)
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now=True)
+
+  class Meta :
+    constraints = [
+      models.UniqueConstraint(
+        fields=["user", "tag_name"],
+        name="tag_unique"
+      )
+    ]
+
+  def __str__(self):
+    return self.tag_name
+
+class PasswordCustomField(models.Model):
+  custom_name = models.TextField(max_length=255)
+  custom_value = models.TextField(max_length=255)
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now=True)
+  
+  def __str__(self):
+    return self.custom_name
 
 class PasswordManage(models.Model):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -85,11 +135,23 @@ class PasswordManage(models.Model):
   email = models.EmailField(blank=True, null=True)
   website = models.URLField(blank=True)
   notes = models.TextField(blank=True)
-  tags = models.CharField(max_length=255, blank=True)
+  index = models.PositiveIntegerField()
+  tag = models.ForeignKey(PasswordTag, null=True, on_delete=models.CASCADE)
+  group = models.ForeignKey(PasswordGroup, null=True, on_delete=models.CASCADE)
+  custom = models.ManyToManyField(PasswordCustomField, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
+  
+  class Meta :
+    constraints = [
+      models.UniqueConstraint(
+        fields=["user", "group_id", "index"],
+        name="index_unique"
+      )
+    ]
   
   def __str__(self):
     return self.title
+
 
 class Task(models.Model):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
