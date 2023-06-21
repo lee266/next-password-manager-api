@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http.response import JsonResponse
 from app.models import User, Message, PasswordManage, Task, Calendar, PasswordGroup, PasswordTag, PasswordCustomField
-from app.api.serializers import UserSerializer, MessageSerializer, PasswordManageSerializer, TaskSerializer, CalendarSerializer, PasswordCustomFieldSerializer
+from app.api.serializers import UserSerializer, MessageSerializer, PasswordManageSerializer, TaskSerializer, CalendarSerializer, PasswordCustomFieldSerializer, PasswordGroupSerializer, PasswordTagSerializer
 
 
 class UserView(generics.ListCreateAPIView):
@@ -52,15 +52,17 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
     userID = request.data["user_id"]
     queryset = self.model.objects.filter(user_id=userID).select_related('group', 'tag').prefetch_related('custom').order_by('index')
     serializer = self.get_serializer(queryset, many=True)
-    
-    grouped_data = {'group': []}
+    # Get a list of all unique group names from the Group model
+    group_names = PasswordGroup.objects.filter(user_id=userID).values_list('group_name', flat=True).distinct()
+    grouped_data = {group_name: [] for group_name in group_names}
+    grouped_data['group'] = []
 
     for data in serializer.data:
         groupData = data['group']
         if groupData is None:
             group_key = 'group'
         else:
-            group_key = "group" + str(groupData['id'])
+            group_key = groupData["group_name"]
         
         if group_key in grouped_data:
             grouped_data[group_key].append(data)
@@ -69,7 +71,22 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
 
     return Response(grouped_data)
 
+class PasswordGroupViewSet(viewsets.ModelViewSet):
+  serializer_class = PasswordGroupSerializer
+  queryset = PasswordGroup.objects.all()
+  # permission_classes = [IsAuthenticated]
+  permission_classes = (AllowAny,)
+  model = PasswordGroup
+  
+  def create(self, request, *args, **kwargs):
+      print("request", request.data)
+      return super().create(request, *args, **kwargs)
 
+class PasswordTagViewSet(viewsets.ModelViewSet):
+  serializer_class = PasswordTagSerializer
+  queryset = PasswordTag.objects.all()
+  permission_classes = (AllowAny,)
+  model = PasswordTag
 
 class PasswordManageView(generics.ListCreateAPIView):
   queryset = PasswordManage.objects.all()
