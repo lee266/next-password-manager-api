@@ -3,6 +3,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 from django.http.response import JsonResponse
 from app.models import User, Message, PasswordManage, Task, Calendar, PasswordGroup, PasswordTag, PasswordCustomField
 from app.api.serializers import UserSerializer, MessageSerializer, PasswordManageSerializer, TaskSerializer, CalendarSerializer, PasswordCustomFieldSerializer, PasswordGroupSerializer, PasswordTagSerializer
@@ -38,13 +39,9 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
   
   @action(detail=False, methods=['post'])
   def search(self, request):
-    print("request",request.data)
     userID = request.data["id"]
     queryset = self.get_queryset().filter(user_id=userID)
     serializer = self.get_serializer(queryset, many=True)
-    print("userID:",request.data["id"])
-    print("queryset:",queryset)
-    print("serializer:",serializer)
     return Response(serializer.data)
   
   @action(detail=False, methods=['post'])
@@ -70,6 +67,52 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
             grouped_data[group_key] = [data]
 
     return Response(grouped_data)
+  
+  @action(detail=False, methods=['patch'])
+  def update_indexes(self, request):
+    print("move update_indexes")
+    passwords_data = request.data.get('new_passwords')
+    old_passwords_data = request.data.get('old_passwords', [])
+    old_group_id = request.data.get('old_group_id')
+    new_group_id = request.data.get('new_group_id')
+    old_group = get_object_or_404(PasswordGroup, pk=old_group_id)
+    new_group = get_object_or_404(PasswordGroup, pk=new_group_id)
+    print("old_group")
+    print(old_group)
+    print("new_group")
+    print(new_group)
+    if passwords_data is not None:
+    # Temporarily set indices to None to avoid uniqueness constraint violation
+      for password_data in passwords_data + old_passwords_data:
+          password_id = password_data.get('id')
+          if password_id is not None:
+              password = PasswordManage.objects.get(pk=password_id)
+              password.index = None
+              password.save()
+
+      # Set the new indices
+      for password_data in passwords_data:
+          password_id = password_data.get('id') 
+          new_index = password_data.get('index')
+          if password_id is not None and new_index is not None and new_group_id is not None:
+              password = PasswordManage.objects.get(pk=password_id)
+              password.group = new_group
+              password.index = new_index
+              password.save()
+      if (old_passwords_data):
+        for password_data in passwords_data:
+          password_id = password_data.get('id') 
+          new_index = password_data.get('index')
+          if password_id is not None and new_index is not None and new_group_id is not None:
+              password = PasswordManage.objects.get(pk=password_id)
+              password.group = old_group
+              password.index = new_index
+              password.save()
+
+      return Response({"detail": "Password indices updated."}, status=status.HTTP_200_OK)
+    else:
+      return Response({"detail": "Passwords not provided."}, status=status.HTTP_400_BAD_REQUEST)
+  
 
 class PasswordGroupViewSet(viewsets.ModelViewSet):
   serializer_class = PasswordGroupSerializer
@@ -78,15 +121,23 @@ class PasswordGroupViewSet(viewsets.ModelViewSet):
   permission_classes = (AllowAny,)
   model = PasswordGroup
   
-  def create(self, request, *args, **kwargs):
-      print("request", request.data)
-      return super().create(request, *args, **kwargs)
+  @action(detail=False, methods=['post'])
+  def get_data(self, request):
+    userID = request.data["user_id"]
+    queryset = self.get_queryset().filter(user_id=userID).values('id', 'group_name')
+    return Response(list(queryset))
 
 class PasswordTagViewSet(viewsets.ModelViewSet):
   serializer_class = PasswordTagSerializer
   queryset = PasswordTag.objects.all()
   permission_classes = (AllowAny,)
   model = PasswordTag
+  
+  @action(detail=False, methods=['post'])
+  def get_data(self, request):
+    userID = request.data["user_id"]
+    queryset = self.get_queryset().filter(user_id=userID).values('id', 'tag_name')
+    return Response(list(queryset))
 
 class PasswordManageView(generics.ListCreateAPIView):
   queryset = PasswordManage.objects.all()
