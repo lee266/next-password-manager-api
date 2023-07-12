@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import JsonResponse
 from app.models import User, Message, PasswordManage, Task, Calendar, PasswordGroup, PasswordTag, PasswordCustomField
 from app.api.serializers import UserSerializer, MessageSerializer, PasswordManageSerializer, TaskSerializer, CalendarSerializer, PasswordCustomFieldSerializer, PasswordGroupSerializer, PasswordTagSerializer
@@ -31,6 +32,46 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
   # permission_classes = [IsAuthenticated]
   permission_classes = (AllowAny,)
   
+  def create(self, request, *args, **kwargs):
+    user_id = request.data.get('user')
+    group_id = request.data.get('group')
+    tag_id = request.data.get('tag')
+    # custom_ids = request.data.get('custom')
+
+    # Check user_id that is required
+    if not user_id:
+        return Response({'error': 'User ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        user = User.objects.get(id=user_id)
+    except ObjectDoesNotExist:
+        return Response({'error': f'User ID {user_id} does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+    # Check group and tag. These are able to null
+    group = None
+    tag = None
+    if group_id:
+        try: group = PasswordGroup.objects.get(id=group_id)
+        except ObjectDoesNotExist:
+            return Response({'error': f'Group ID {group_id} does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+    if tag_id:
+        try: tag = PasswordTag.objects.get(id=tag_id)
+        except ObjectDoesNotExist:
+            return Response({'error': f'Tag ID {tag_id} does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Compute the index based on the last 'PasswordManage' record for the given group
+    if group:
+        last_password_manage = PasswordManage.objects.filter(group=group).order_by('-index').first()
+    else:
+        last_password_manage = PasswordManage.objects.filter(group__isnull=True).order_by('-index').first()
+    # Index set 0 if not record in database
+    next_index = last_password_manage.index + 1 if last_password_manage else 0
+    
+    data = {k: v for k, v in request.data.items() if k not in ['user', 'group', 'tag']}
+    # Save to database 
+    password_manage = PasswordManage.objects.create(user=user, group=group, tag=tag, index=next_index, **data)
+    # password_manage.save()
+    serializer = self.get_serializer(password_manage)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
   @action(detail=False, methods=['get'])
   def columns(self):
     serializer = self.get_serializer()
