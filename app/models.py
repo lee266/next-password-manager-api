@@ -4,6 +4,8 @@ from django.contrib.auth.models import PermissionsMixin, UserManager
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
+
 
 """_summary_
   Naming convention:
@@ -97,6 +99,11 @@ class PasswordGroup(models.Model):
         name="group_unique"
       )
     ]
+  
+  # Do not input other 
+  # def clean(self):
+  #   if self.group_name.lower() == "other":
+  #     raise ValidationError("group_name cannot be 'other'")
   
   def __str__(self):
     return self.group_name

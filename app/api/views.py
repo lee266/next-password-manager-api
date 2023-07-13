@@ -93,12 +93,13 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
     # Get a list of all unique group names from the Group model
     group_names = PasswordGroup.objects.filter(user_id=userID).values_list('group_name', flat=True).distinct()
     grouped_data = {group_name: [] for group_name in group_names}
-    grouped_data['group'] = []
+    
+    grouped_data['other'] = []
 
     for data in serializer.data:
         groupData = data['group']
         if groupData is None:
-            group_key = 'group'
+            group_key = 'other'
         else:
             group_key = groupData["group_name"]
         
@@ -112,19 +113,27 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
   @action(detail=False, methods=['patch'])
   def update_indexes(self, request):
     print("move update_indexes")
-    passwords_data = request.data.get('new_passwords')
-    old_passwords_data = request.data.get('old_passwords', [])
-    old_group_id = request.data.get('old_group_id')
-    new_group_id = request.data.get('new_group_id')
-    old_group = get_object_or_404(PasswordGroup, pk=old_group_id)
-    new_group = get_object_or_404(PasswordGroup, pk=new_group_id)
-    print("old_group")
-    print(old_group)
-    print("new_group")
-    print(new_group)
-    if passwords_data is not None:
+    passwordsData = request.data.get('new_passwords')
+    oldPasswordsData = request.data.get('old_passwords', [])
+    oldGroup = request.data.get('old_group')
+    newGroup = request.data.get('new_group')
+    user = request.data.get('user')
+    userId = user["id"]
+    print(f"passwordsData: {passwordsData}")
+    print(f"oldPasswordsData: {oldPasswordsData}")
+    print(f"oldGroup: {oldGroup}")
+    print(f"newGroup: {newGroup}")
+    print(f"user: {user}")
+    print(f"userId: {userId}")
+    # get relation data 
+    old_group = get_object_or_404(PasswordGroup, group_name=oldGroup ,user=userId) if oldGroup != 'other' else None
+    new_group = get_object_or_404(PasswordGroup, group_name=newGroup ,user=userId) if newGroup != 'other' else None
+    print(f"old_group: {old_group}")
+    print(f"new_group: {new_group}")
+    
+    if passwordsData:
     # Temporarily set indices to None to avoid uniqueness constraint violation
-      for password_data in passwords_data + old_passwords_data:
+      for password_data in passwordsData + oldPasswordsData:
           password_id = password_data.get('id')
           if password_id is not None:
               password = PasswordManage.objects.get(pk=password_id)
@@ -132,19 +141,20 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
               password.save()
 
       # Set the new indices
-      for password_data in passwords_data:
+      for password_data in passwordsData:
           password_id = password_data.get('id') 
           new_index = password_data.get('index')
-          if password_id is not None and new_index is not None and new_group_id is not None:
+          if password_id is not None and new_index is not None:
               password = PasswordManage.objects.get(pk=password_id)
               password.group = new_group
               password.index = new_index
               password.save()
-      if (old_passwords_data):
-        for password_data in passwords_data:
-          password_id = password_data.get('id') 
+
+      if oldPasswordsData:
+        for password_data in oldPasswordsData:
+          password_id = password_data.get('id')
           new_index = password_data.get('index')
-          if password_id is not None and new_index is not None and new_group_id is not None:
+          if password_id is not None and new_index is not None:
               password = PasswordManage.objects.get(pk=password_id)
               password.group = old_group
               password.index = new_index
