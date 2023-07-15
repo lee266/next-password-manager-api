@@ -72,19 +72,86 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
     serializer = self.get_serializer(password_manage)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+  def update(self, request, *args, **kwargs):
+    changeGroup = request.data.get('changeGroup')
+    group_id = request.data.get('group')
+    tag_id = request.data.get('tag')
+
+    # Fetch the object to update
+    password_manage = self.get_object()
+
+    tag = PasswordTag.objects.get(id=tag_id) if tag_id else None
+
+    if changeGroup:
+      # If group change is requested, re-index the old groups
+      
+      # Update index of the passwords in the original group
+      old_group_passwords = (
+        PasswordManage.objects.filter(group=password_manage.group)
+        .exclude(id=password_manage.id) 
+        if password_manage.group else 
+        PasswordManage.objects.filter(group__isnull=True).exclude(id=password_manage.id))
+      for i, pm in enumerate(old_group_passwords.order_by('index')):
+          pm.index = i
+          pm.save()
+
+      # Compute new index as the last index of the destination group + 1
+      group = PasswordGroup.objects.get(id=group_id) if group_id else None
+      last_password_manage = (
+        PasswordManage.objects.filter(group=group).order_by('-index').first() 
+        if group else 
+        PasswordManage.objects.filter(group__isnull=True).order_by('-index').first()
+      )
+      new_index = last_password_manage.index + 1 if last_password_manage else 0
+      
+      # Update the group and index
+      password_manage.group = group
+      password_manage.index = new_index
+    
+    # Update the rest of the fields
+    password_manage.tag = tag
+    data = {k: v for k, v in request.data.items() if k not in ['user', 'group', 'tag', 'changeGroup']}
+    for k, v in data.items():
+        if hasattr(password_manage, k):
+            setattr(password_manage, k, v)
+
+    password_manage.save()
+
+    serializer = self.get_serializer(password_manage)
+    return Response(serializer.data)
+
+  def destroy(self, request, *args, **kwargs):
+    password_manage = self.get_object()
+    # Delete password
+    password_manage.delete()
+
+    # Fetch all PasswordManage objects in the same group and sort them by index
+    group_id = request.data.get('group', None)
+    if group_id:
+        passwords_in_same_group = PasswordManage.objects.filter(group=group_id).order_by('index')
+    else:
+        passwords_in_same_group = PasswordManage.objects.filter(group__isnull=True).order_by('index')
+
+    # Re-assign indices
+    for new_index, password in enumerate(passwords_in_same_group):
+        password.index = new_index
+        password.save()
+
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
   @action(detail=False, methods=['get'])
   def columns(self):
     serializer = self.get_serializer()
     columns = [field for field in serializer.fields.keys()]
     return Response(columns)
-  
+
   @action(detail=False, methods=['post'])
   def search(self, request):
     userID = request.data["id"]
     queryset = self.get_queryset().filter(user_id=userID)
     serializer = self.get_serializer(queryset, many=True)
     return Response(serializer.data)
-  
+
   @action(detail=False, methods=['post'])
   def get_data(self, request):
     userID = request.data["user_id"]
@@ -109,7 +176,7 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
             grouped_data[group_key] = [data]
 
     return Response(grouped_data)
-  
+
   @action(detail=False, methods=['patch'])
   def update_indexes(self, request):
     print("move update_indexes")
@@ -163,7 +230,7 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
       return Response({"detail": "Password indices updated."}, status=status.HTTP_200_OK)
     else:
       return Response({"detail": "Passwords not provided."}, status=status.HTTP_400_BAD_REQUEST)
-  
+
 
 class PasswordGroupViewSet(viewsets.ModelViewSet):
   serializer_class = PasswordGroupSerializer
