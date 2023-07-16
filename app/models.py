@@ -143,7 +143,7 @@ class PasswordManage(models.Model):
   website = models.URLField(blank=True)
   notes = models.TextField(blank=True)
   index = models.PositiveIntegerField(null=True)
-  tag = models.ForeignKey(PasswordTag, null=True, on_delete=models.CASCADE)
+  tag = models.ForeignKey(PasswordTag, null=True, on_delete=models.SET_NULL)
   group = models.ForeignKey(PasswordGroup, null=True, on_delete=models.CASCADE)
   custom = models.ManyToManyField(PasswordCustomField, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
