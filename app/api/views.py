@@ -8,6 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import JsonResponse
 from app.models import User, Message, PasswordManage, Task, Calendar, PasswordGroup, PasswordTag, PasswordCustomField
 from app.api.serializers import UserSerializer, MessageSerializer, PasswordManageSerializer, TaskSerializer, CalendarSerializer, PasswordCustomFieldSerializer, PasswordGroupSerializer, PasswordTagSerializer
+from django.db.models import Q
 
 
 class UserView(generics.ListCreateAPIView):
@@ -147,10 +148,57 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
 
   @action(detail=False, methods=['post'])
   def search(self, request):
-    userID = request.data["id"]
-    queryset = self.get_queryset().filter(user_id=userID)
+    print("requests")
+    print(request.data)
+    userID = request.data["user_id"]
+    passwordFilters = request.data["passwordFilters"]
+
+    queryset = self.get_queryset().filter(user_id=userID).order_by('index')
+
+    # Apply additional filters based on `passwordFilters`
+    if passwordFilters and passwordFilters is not None:
+        print("move")
+        if 'title' in passwordFilters:
+            queryset = queryset.filter(title__icontains=passwordFilters['title'])
+        if 'tags' in passwordFilters and passwordFilters['tags']:
+            queryset = queryset.filter(tag__id__in=passwordFilters['tags'])
+        if 'groups' in passwordFilters and passwordFilters['groups']:
+            if (-1 in passwordFilters['groups']):
+              group_filters = passwordFilters['groups'].copy()
+              group_filters.remove(-1)
+              queryset = queryset.filter(Q(group__isnull=True) | Q(group__in=group_filters))
+            else:
+              queryset = queryset.filter(group__in=passwordFilters['groups'])
+
     serializer = self.get_serializer(queryset, many=True)
-    return Response(serializer.data)
+
+    # Get a list of all unique group names from the Group model
+    if passwordFilters:  
+      if 'groups' in passwordFilters and passwordFilters['groups']:
+          group_names = PasswordGroup.objects.filter(user_id=userID, id__in=passwordFilters['groups']).values_list('group_name', flat=True).distinct()
+          grouped_data = {group_name: [] for group_name in group_names}
+          if (-1 in passwordFilters['groups']):
+            grouped_data['other'] = []
+      else: 
+        group_names = PasswordGroup.objects.filter(user_id=userID).values_list('group_name', flat=True).distinct()
+        grouped_data = {group_name: [] for group_name in group_names}
+        grouped_data['other'] = []
+    else:
+        group_names = PasswordGroup.objects.filter(user_id=userID).values_list('group_name', flat=True).distinct()
+        grouped_data = {group_name: [] for group_name in group_names}
+        grouped_data['other'] = []
+
+    for data in serializer.data:
+        groupData = data['group']
+        if groupData is None:
+            group_key = 'other'
+        else:
+            group_key = groupData["group_name"]
+
+        if group_key in grouped_data:
+            grouped_data[group_key].append(data)
+
+    return Response(grouped_data)
 
   @action(detail=False, methods=['post'])
   def get_data(self, request):
