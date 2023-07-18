@@ -41,6 +41,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1:8000",
     "http://127.0.0.1:3000",
     "django",
+    "https://next-password-manager-app.vercel.app",  # ここを変更しました
 ]
 
 AUTH_USER_MODEL = 'app.User'
@@ -75,6 +76,7 @@ MIDDLEWARE = [
 CORS_ORIGIN_WHITELIST = (
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://next-password-manager-app.vercel.app",
 )
 CORS_ALLOW_CREDENTIALS = True
 WHITENOISE_ALLOW_ALL_ORIGINS = True
