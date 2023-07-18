@@ -137,8 +137,8 @@ class PasswordCustomField(models.Model):
 
 class PasswordManage(models.Model):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
-  title = models.CharField(max_length=255, blank=True)
-  password = models.TextField()
+  title = models.CharField(max_length=255)
+  password = models.TextField(blank=True, null=True)
   email = models.EmailField(blank=True, null=True)
   website = models.URLField(blank=True)
   notes = models.TextField(blank=True)
