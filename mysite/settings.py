@@ -24,10 +24,6 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ['SECRET_KEY']
 
@@ -39,15 +35,15 @@ ALLOWED_HOSTS = []
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-ALLOWED_HOSTS.append([
-    "http://localhost:3000",
+
+ALLOWED_HOSTS += [
+    "localhost:3000",
     "localhost",
     "127.0.0.1",
     "127.0.0.1:8000",
-    "http://127.0.0.1:3000",
     "django",
-    "https://next-password-manager-app.vercel.app",
-])
+    "next-password-manager-app.vercel.app",
+]
 
 AUTH_USER_MODEL = 'app.User'
 
@@ -59,7 +55,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
     'rest_framework',
     'corsheaders',
     'app',
@@ -79,11 +74,11 @@ MIDDLEWARE = [
 ]
 
 # CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = (
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "https://next-password-manager-app.vercel.app",
-)
+CORS_ORIGIN_WHITELIST = [
+    "localhost:3000",
+    "127.0.0.1:3000",
+    "next-password-manager-app.vercel.app",
+]
 CORS_ALLOW_CREDENTIALS = True
 WHITENOISE_ALLOW_ALL_ORIGINS = True
 
@@ -154,31 +149,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'mydb',
-#         'USER' : os.environ['MYSQL_USER'],
-#         'PASSWORD': os.environ['MYSQL_PASSWORD'],
-#         'HOST': 'database',
-#     }
-# }
-
 DATABASES = {
     'default': dj_database_url.config(
-        # Feel free to alter this value to suit your needs.
         default='postgresql://postgres:postgres@localhost:5432/mysite',
         conn_max_age=600
     )
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -195,32 +171,19 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
-
 LANGUAGE_CODE = 'ja'
-
 TIME_ZONE = 'Asia/Tokyo'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
-
 STATIC_URL = '/static/'
 STATIC_ROOT = str(BASE_DIR / 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-
 # Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SUPERUSER_NAME = os.environ['SUPERUSER_NAME']
