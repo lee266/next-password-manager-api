@@ -9,6 +9,7 @@ PyJWT
 python-decouple
 dj-database-url
 dj_static
+whitenoise
 
 # can use env file
 python-dotenv
