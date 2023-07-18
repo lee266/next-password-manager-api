@@ -42,7 +42,7 @@ ALLOWED_HOSTS += [
     "127.0.0.1",
     "127.0.0.1:8000",
     "django",
-    "next-password-manager-app.vercel.app",
+    "https://next-password-manager-app.vercel.app",
 ]
 
 AUTH_USER_MODEL = 'app.User'
