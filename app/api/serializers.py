@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from app.models import User, Message, PasswordManage, Task, Calendar, PasswordCustomField, PasswordGroup, PasswordTag
+from app.models import User, Message, PasswordManage, Task, Calendar, PasswordCustomField, PasswordGroup, PasswordTag, InquiryCategory, Inquiry
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -51,6 +51,21 @@ class PasswordManageSerializer(serializers.ModelSerializer):
   
   class Meta:
     model = PasswordManage
+    fields = '__all__'
+
+class InquiryCategorySerializer(serializers.ModelSerializer):
+  created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+  
+  class Meta:
+    model = InquiryCategory
+    fields = '__all__'
+
+class InquirySerializer(serializers.ModelSerializer):
+  created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+  Inquiry_category = InquiryCategorySerializer(read_only=True)
+  
+  class Meta:
+    model = Inquiry
     fields = '__all__'
 
 class TaskSerializer(serializers.ModelSerializer):
