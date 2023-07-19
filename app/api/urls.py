@@ -11,6 +11,7 @@ router.register(r'groups', views.PasswordGroupViewSet, basename="groups")
 router.register(r'tags', views.PasswordTagViewSet, basename="tags")
 router.register(r'tasks', views.TaskViewSet, basename="tasks")
 router.register(r'calendars', views.CalendarViewSet, basename="calendars")
+router.register(r'inquiry', views.InquiryViewSet, basename="inquiries")
 
 urlpatterns = [
     path('', include(router.urls)),

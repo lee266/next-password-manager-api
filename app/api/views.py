@@ -6,8 +6,8 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import JsonResponse
-from app.models import User, Message, PasswordManage, Task, Calendar, PasswordGroup, PasswordTag, PasswordCustomField
-from app.api.serializers import UserSerializer, MessageSerializer, PasswordManageSerializer, TaskSerializer, CalendarSerializer, PasswordCustomFieldSerializer, PasswordGroupSerializer, PasswordTagSerializer
+from app.models import User, Message, PasswordManage, Task, Calendar, PasswordGroup, PasswordTag, PasswordCustomField, Inquiry, InquiryCategory
+from app.api.serializers import UserSerializer, MessageSerializer, PasswordManageSerializer, TaskSerializer, CalendarSerializer, PasswordCustomFieldSerializer, PasswordGroupSerializer, PasswordTagSerializer, InquiryCategorySerializer, InquirySerializer
 from django.db.models import Q
 
 
@@ -310,6 +310,11 @@ class PasswordManageView(generics.ListCreateAPIView):
   serializer_class = PasswordManageSerializer
   permission_classes = (AllowAny,)
 
+
+class InquiryViewSet(viewsets.ModelViewSet):
+  serializer_class = InquirySerializer
+  queryset = Inquiry.objects.all()
+  model = Inquiry
 class TaskViewSet(viewsets.ModelViewSet):
   queryset = Task.objects.all()
   serializer_class = TaskSerializer
