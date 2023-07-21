@@ -190,9 +190,11 @@ class InquiryCategory(models.Model):
 
 class Inquiry(models.Model):
     STATUS_CHOICES = [
-        ('Open', 'Open'),
-        ('In Progress', 'In Progress'),
-        ('Closed', 'Closed'),
+        ('UNREAD', 'Unread'),
+        ('READ', 'Read'),
+        ('IN_PROGRESS', 'In Progress'),
+        ('ANSWERED', 'Answered'),
+        ('CLOSED', 'Closed')
     ]
 
     inquiry_category = models.ForeignKey(InquiryCategory, on_delete=models.CASCADE)
@@ -200,7 +202,7 @@ class Inquiry(models.Model):
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default='Open',
+        default='UNREAD',
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -315,6 +315,14 @@ class InquiryViewSet(viewsets.ModelViewSet):
   serializer_class = InquirySerializer
   queryset = Inquiry.objects.all()
   model = Inquiry
+  permission_classes = (AllowAny,)
+
+class InquiryCategoryViewSet(viewsets.ModelViewSet):
+  serializer_class = InquiryCategorySerializer
+  queryset = InquiryCategory.objects.all()
+  model = InquiryCategory
+  permission_classes = (AllowAny,)
+
 class TaskViewSet(viewsets.ModelViewSet):
   queryset = Task.objects.all()
   serializer_class = TaskSerializer
