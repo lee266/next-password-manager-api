@@ -2,7 +2,7 @@
 
 # MySQL root user password
 MYSQL_ROOT_PASSWORD=root_pass
-# databese name
+# database name
 MYSQL_DATABASE=db_name
 # create new user can login mysql
 MYSQL_USER=user_name

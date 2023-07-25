@@ -2,7 +2,7 @@
 
 ## How to start
 
-- Please copy dockercompose_copy and dockercompose_env and ER-dialogram-copy at root dir
+- Please copy dockercompose_copy and dockercompose_env and ER-diagram-copy at root dir
 - Do docker compose up -d --build
 - Do python3 manage.py makemigrations
 - Do python3 manage.py migrate
