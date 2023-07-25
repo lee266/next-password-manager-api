@@ -1,4 +1,21 @@
-# Commands
+# Backend of Password manager
+
+## How to start
+
+- Please copy dockercompose_copy and dockercompose_env and ER-diagram-copy at root dir
+- Do docker compose up -d --build
+- Do python3 manage.py makemigrations
+- Do python3 manage.py migrate
+
+## Database
+
+If you want to see a ER of database
+
+- move to /ER-diagram/mysql.pu
+- Do Alt + D
+- OR please check /api/ER-diagram-copy/mysql.png
+
+## Commands
 
 if you want join django
 

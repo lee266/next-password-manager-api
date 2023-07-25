@@ -1,0 +1,89 @@
+version: '3'
+
+services:
+  next:
+    platform: linux/amd64
+    # platform: linux/x86_64
+    build: 
+      context: ./
+      dockerfile: app/Dockerfile
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      # - WATCHPACK_POLLING=true
+    ports:
+      - "3000:3000"
+    container_name: password_next
+    volumes:
+      - ./app/:/usr/src/app
+    command: yarn dev
+  
+  django:
+    platform: linux/amd64
+    # platform: linux/x86_64
+    build:
+      context: ./
+      dockerfile: api/Dockerfile
+    container_name: password_django
+    command: 
+      # python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./api:/usr/src/api
+    ports:
+      - "8000:8000"
+    tty: true
+    depends_on:
+      - database
+
+  database:
+    platform: linux/amd64
+    # platform: linux/x86_64
+    build: 
+      context: ./docker/mysql
+      dockerfile: Dockerfile
+    container_name: password_database
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      # this variable is mandatory. this is the root user password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      # name of a database
+      MYSQL_DATABASE: mydb
+      # create new user
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
+      TZ: "Asia/Tokyo"
+    ports:
+      - "${HOST_MACHINE_MYSQL_PORT}:3306"
+  
+  phpmyadmin:
+    platform: linux/amd64
+    # platform: linux/x86_64
+    image: phpmyadmin/phpmyadmin
+    container_name: password_phpmyadmin
+    environment:
+      - PMA_ABITRARY=1
+      - PMA_HOST=database
+      - PMA_USER=${MYSQL_USER}
+      - PMA_PASSWORD=${MYSQL_PASSWORD}
+      - UPLOAD_LIMIT=100M
+      - MEMORY_LIMIT=200M
+    ports:
+      - "8087:80"
+    volumes:
+      - "./phpmyadmin/sessions:/sessions"
+    depends_on:
+      - database
+  
+  plantuml-server:
+    build:
+      context: ./docker/plantuml
+      dockerfile: Dockerfile
+    container_name: plantuml-server
+    ports:
+      - "8003:8080"
+
+volumes:
+  mysql:
