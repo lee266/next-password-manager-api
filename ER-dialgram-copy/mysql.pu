@@ -1,0 +1,133 @@
+@startuml mysql
+hide circle
+
+
+entity "users" as users {
+  id
+  --
+  username (string)
+  email (email)
+  password (string)
+  last_login  (date)
+  is_superuser (number)
+  is_staff (number)
+  is_active (number)
+  created_at
+}
+
+entity "income_expense" as incomeExpense {
+  id
+  --
+  user_id <<FK>>
+  money
+  category
+  subcategory
+  date
+  note
+  created_at
+  updated_at
+}
+
+entity "calendar" as calendaer {
+  id
+  --
+  user_id <<FK>>
+  title_
+  start
+  end
+  all_day
+  created_at
+  updated_at
+}
+
+entity "passwordmanage" as passwordmanage {
+  password_manage_id
+  --
+  user_id <<FK>>
+  title_ (string)
+  account (string, nullable)
+  password (string)
+  website (string, nullable)
+  notes (string, nullable)
+  tag_id <<FK>> (nullable)
+  group_id <<FK>> (nullable)
+  custom_id <<FK>> (nullable)
+  index (number)
+  created_at
+  uniqueConstraint(user_id, group_id, index)
+}
+
+/'
+  index: position of group, this column is for order of drag and drop
+'/
+
+entity "password_gropues" as passwordGroup {
+  group_id
+  --
+  user_id <<FK>>
+  group_name (string, not add "other")
+  created_at
+  updated_at
+  uniqueConstraint(group_name, user_id)
+}
+
+entity "password_tags" as passwrodTag {
+  tags_id
+  --
+  user_id <<FK>>
+  tag_name (string)
+  created_at
+  updated_at
+  uniqueConstraint(user_id, tag_name)
+}
+
+/'
+  This is Intermediate tables
+  passwordmanage table and passwordcustomfiled table.  many-to-many
+'/
+entity "passwordmanage_custom" as passwordManageCustom {
+  id
+  --
+  password_manage_id <<FK>>
+  passwordcustomfiled_id <<FK>>
+}
+
+entity "password_customfield" as passwordCustom {
+  custom_field_id
+  -- 
+  custom_id <<FK>>
+  custom_name
+  custom_value
+}
+
+entity "memo" as memo {
+  memo_id
+  --
+  user_id <<FK>>
+  text (string)
+}
+
+entity "inquiry" as inquiry {
+  inquiry_id
+  ----
+  inquiry_category_id <<FK>>
+  inquiry_content
+  status
+}
+
+entity "inquiry_categorys" as inquiryCategory {
+  inquiry_category_id
+  --
+  category_name (string)
+}
+
+users ||--|{ incomeExpense
+users ||--|{ calendaer
+users ||--|{ passwordmanage
+passwordmanage ||--|{ passwordGroup
+passwordmanage ||--|{ passwrodTag
+passwordManageCustom ||--|{ passwordmanage
+passwordManageCustom ||--|{ passwordCustom
+inquiry ||--|{ inquiryCategory
+
+@enduml
