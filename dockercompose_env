@@ -1,0 +1,11 @@
+# --MySQL--
+
+# MySQL root user password
+MYSQL_ROOT_PASSWORD=root_pass
+# databese name
+MYSQL_DATABASE=db_name
+# create new user can login mysql
+MYSQL_USER=user_name
+MYSQL_PASSWORD=db_pass
+
+HOST_MACHINE_MYSQL_PORT=3300
