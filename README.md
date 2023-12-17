@@ -1,11 +1,31 @@
 # Backend of Password manager
 
-## How to start
+## Overview
 
-- Please copy dockercompose_copy and dockercompose_env and ER-diagram-copy at root dir
-- Do docker compose up -d --build
-- Do python3 manage.py makemigrations
-- Do python3 manage.py migrate
+This is api server
+
+## Getting Started
+
+Please copy env
+
+```sh
+cp .env.example .env
+```
+
+### Git clone
+
+if you want to use monorepo repository, first Please clone it and Check README.md (recommend)
+[next-password-manager-monorepo](https://github.com/Lee266/next-password-manager-monorepo)
+
+### Initialize Project
+
+Move to your parent directory.
+
+```sh
+docker exec -it password_django sh
+python3 manage.py makemigrations
+python3 manage.py migrate
+```
 
 ## Database
 
@@ -13,28 +33,29 @@ If you want to see a ER of database
 
 - move to /ER-diagram/mysql.pu
 - Do Alt + D
-- OR please check /api/ER-diagram-copy/mysql.png
+- Alternatively, check /api/ER-diagram-copy/mysql.png
 
 ## Commands
 
-if you want join django
+### Join Django Container
 
 - docker exec -it  password_django sh
 
-python update
+### Database Migrations
 
 - python3 manage.py makemigrations
 - python3 manage.py migrate
 
-seeder
+### Seeder
 
 - python3 manage.py post_initial.json
 
-your first time please do under code
+For the first time, execute:
 
 - python3 manage.py createsuperuser
 
-How to see ER diagram
+## Environments
 
-- move to ER-diagram/mysql.pu
-- Alt + D
+- Django v4.2.3
+- Python v3.10
+- Django RestFramework v3.14.0
