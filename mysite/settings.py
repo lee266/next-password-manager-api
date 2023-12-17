@@ -18,8 +18,10 @@ from datetime import timedelta
 from decouple import config
 import dj_database_url
 
-# Loading environment values from .env 
+# Loading environment values from .env
 load_dotenv()
+
+DEVELOP = os.environ.get('DEVELOP') == 'True'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -156,16 +158,16 @@ DATABASES = {
     )
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'mydb',
-#         'USER' : os.environ['MYSQL_USER'],
-#         'PASSWORD': os.environ['MYSQL_PASSWORD'],
-#         'HOST': 'database',
-#     }
-# }
-
+if DEVELOP:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'mydb',
+            'USER' : os.environ['MYSQL_USER'],
+            'PASSWORD': os.environ['MYSQL_PASSWORD'],
+            'HOST': 'database',
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
