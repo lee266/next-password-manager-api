@@ -1,14 +1,16 @@
-Django==3.2.10
+django==4.2.3
+dj-database-url
+dj_static
+python-decouple
 psycopg2-binary>=2.8
-djangorestframework==3.12.4
+djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
 django-cors-headers
 djoser>==2.1.0
 mysqlclient
 PyJWT
-python-decouple
-dj-database-url
-dj_static
+whitenoise
+gunicorn
 
 # can use env file
 python-dotenv

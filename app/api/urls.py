@@ -2,14 +2,17 @@ from django.urls import path
 from django.conf.urls import include
 from rest_framework import routers
 from app.api import views
-# from djoser.views import PasswordResetView, PasswordResetConfirmView
+
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet, basename="users")
 router.register(r'passwords', views.PasswordManageViewSet, basename="passwords")
+router.register(r'groups', views.PasswordGroupViewSet, basename="groups")
+router.register(r'tags', views.PasswordTagViewSet, basename="tags")
 router.register(r'tasks', views.TaskViewSet, basename="tasks")
 router.register(r'calendars', views.CalendarViewSet, basename="calendars")
-
+router.register(r'inquiry', views.InquiryViewSet, basename="inquiries")
+router.register(r'inquiryCategories', views.InquiryCategoryViewSet, basename="inquiry-categories")
 
 urlpatterns = [
     path('', include(router.urls)),
