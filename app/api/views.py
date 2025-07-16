@@ -20,7 +20,7 @@ class MessageView(generics.ListCreateAPIView):
   queryset = Message.objects.all()
   serializer_class = MessageSerializer
   permission_classes = (AllowAny,)
-  
+
 class UserViewSet(viewsets.ModelViewSet):
   queryset = User.objects.all()
   serializer_class = UserSerializer
@@ -32,7 +32,7 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
   model = PasswordManage
   # permission_classes = [IsAuthenticated]
   permission_classes = (AllowAny,)
-  
+
   def create(self, request, *args, **kwargs):
     user_id = request.data.get('user')
     group_id = request.data.get('group')
@@ -57,7 +57,7 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
         try: tag = PasswordTag.objects.get(id=tag_id)
         except ObjectDoesNotExist:
             return Response({'error': f'Tag ID {tag_id} does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
-    
+
     # Compute the index based on the last 'PasswordManage' record for the given group
     if group:
         last_password_manage = PasswordManage.objects.filter(group=group).order_by('-index').first()
@@ -65,9 +65,9 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
         last_password_manage = PasswordManage.objects.filter(group__isnull=True).order_by('-index').first()
     # Index set 0 if not record in database
     next_index = last_password_manage.index + 1 if last_password_manage else 0
-    
+
     data = {k: v for k, v in request.data.items() if k not in ['user', 'group', 'tag']}
-    # Save to database 
+    # Save to database
     password_manage = PasswordManage.objects.create(user=user, group=group, tag=tag, index=next_index, **data)
     # password_manage.save()
     serializer = self.get_serializer(password_manage)
@@ -85,12 +85,12 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
 
     if changeGroup:
       # If group change is requested, re-index the old groups
-      
+
       # Update index of the passwords in the original group
       old_group_passwords = (
         PasswordManage.objects.filter(group=password_manage.group)
-        .exclude(id=password_manage.id) 
-        if password_manage.group else 
+        .exclude(id=password_manage.id)
+        if password_manage.group else
         PasswordManage.objects.filter(group__isnull=True).exclude(id=password_manage.id))
       for i, pm in enumerate(old_group_passwords.order_by('index')):
           pm.index = i
@@ -99,16 +99,16 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
       # Compute new index as the last index of the destination group + 1
       group = PasswordGroup.objects.get(id=group_id) if group_id else None
       last_password_manage = (
-        PasswordManage.objects.filter(group=group).order_by('-index').first() 
-        if group else 
+        PasswordManage.objects.filter(group=group).order_by('-index').first()
+        if group else
         PasswordManage.objects.filter(group__isnull=True).order_by('-index').first()
       )
       new_index = last_password_manage.index + 1 if last_password_manage else 0
-      
+
       # Update the group and index
       password_manage.group = group
       password_manage.index = new_index
-    
+
     # Update the rest of the fields
     password_manage.tag = tag
     data = {k: v for k, v in request.data.items() if k not in ['user', 'group', 'tag', 'changeGroup']}
@@ -173,13 +173,13 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
     serializer = self.get_serializer(queryset, many=True)
 
     # Get a list of all unique group names from the Group model
-    if passwordFilters:  
+    if passwordFilters:
       if 'groups' in passwordFilters and passwordFilters['groups']:
           group_names = PasswordGroup.objects.filter(user_id=userID, id__in=passwordFilters['groups']).values_list('group_name', flat=True).distinct()
           grouped_data = {group_name: [] for group_name in group_names}
           if (-1 in passwordFilters['groups']):
             grouped_data['other'] = []
-      else: 
+      else:
         group_names = PasswordGroup.objects.filter(user_id=userID).values_list('group_name', flat=True).distinct()
         grouped_data = {group_name: [] for group_name in group_names}
         grouped_data['other'] = []
@@ -208,7 +208,7 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
     # Get a list of all unique group names from the Group model
     group_names = PasswordGroup.objects.filter(user_id=userID).values_list('group_name', flat=True).distinct()
     grouped_data = {group_name: [] for group_name in group_names}
-    
+
     grouped_data['other'] = []
 
     for data in serializer.data:
@@ -217,7 +217,7 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
             group_key = 'other'
         else:
             group_key = groupData["group_name"]
-        
+
         if group_key in grouped_data:
             grouped_data[group_key].append(data)
         else:
@@ -240,12 +240,12 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
     print(f"newGroup: {newGroup}")
     print(f"user: {user}")
     print(f"userId: {userId}")
-    # get relation data 
+    # get relation data
     old_group = get_object_or_404(PasswordGroup, group_name=oldGroup ,user=userId) if oldGroup != 'other' else None
     new_group = get_object_or_404(PasswordGroup, group_name=newGroup ,user=userId) if newGroup != 'other' else None
     print(f"old_group: {old_group}")
     print(f"new_group: {new_group}")
-    
+
     if passwordsData:
     # Temporarily set indices to None to avoid uniqueness constraint violation
       for password_data in passwordsData + oldPasswordsData:
@@ -257,7 +257,7 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
 
       # Set the new indices
       for password_data in passwordsData:
-          password_id = password_data.get('id') 
+          password_id = password_data.get('id')
           new_index = password_data.get('index')
           if password_id is not None and new_index is not None:
               password = PasswordManage.objects.get(pk=password_id)
@@ -279,14 +279,13 @@ class PasswordManageViewSet(viewsets.ModelViewSet):
     else:
       return Response({"detail": "Passwords not provided."}, status=status.HTTP_400_BAD_REQUEST)
 
-
 class PasswordGroupViewSet(viewsets.ModelViewSet):
   serializer_class = PasswordGroupSerializer
   queryset = PasswordGroup.objects.all()
   # permission_classes = [IsAuthenticated]
   permission_classes = (AllowAny,)
   model = PasswordGroup
-  
+
   @action(detail=False, methods=['post'])
   def get_data(self, request):
     userID = request.data["user_id"]
@@ -298,7 +297,7 @@ class PasswordTagViewSet(viewsets.ModelViewSet):
   queryset = PasswordTag.objects.all()
   permission_classes = (AllowAny,)
   model = PasswordTag
-  
+
   @action(detail=False, methods=['post'])
   def get_data(self, request):
     userID = request.data["user_id"]
@@ -309,7 +308,6 @@ class PasswordManageView(generics.ListCreateAPIView):
   queryset = PasswordManage.objects.all()
   serializer_class = PasswordManageSerializer
   permission_classes = (AllowAny,)
-
 
 class InquiryViewSet(viewsets.ModelViewSet):
   serializer_class = InquirySerializer
@@ -360,4 +358,3 @@ class TestAppView(APIView):
   def delete(self, request, **kwargs):
     return JsonResponse({ "data": "delete" })
 
-  
