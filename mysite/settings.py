@@ -39,13 +39,17 @@ if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 ALLOWED_HOSTS += [
-    "localhost:3000",
-    "localhost",
-    "127.0.0.1",
-    "127.0.0.1:8000",
     "django",
     "next-password-manager-app.vercel.app",
 ]
+
+if DEVELOP:
+    ALLOWED_HOSTS += [
+        "localhost:3000",
+        "localhost",
+        "127.0.0.1",
+        "127.0.0.1:8000",
+    ]
 
 AUTH_USER_MODEL = 'app.User'
 
@@ -77,10 +81,15 @@ MIDDLEWARE = [
 
 # CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
     "https://next-password-manager-app.vercel.app",
 ]
+
+if DEVELOP:
+    CORS_ORIGIN_WHITELIST += [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+
 CORS_ALLOW_CREDENTIALS = True
 WHITENOISE_ALLOW_ALL_ORIGINS = True
 
@@ -105,6 +114,7 @@ DJOSER = {
     'USER_CREATE_PASSWORD_RETYPE': True,
     'SERIALIZERS': {
         'user_create': 'app.api.serializers.UserSerializer',
+        'user_create_password_retype': 'app.api.serializers.UserSerializer',
         'user': 'app.api.serializers.UserSerializer',
         'current_user': 'app.api.serializers.UserSerializer'
     },
