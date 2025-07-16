@@ -17,18 +17,18 @@ from django.core.exceptions import ValidationError
 """
 class UserManager(BaseUserManager):
   use_in_migrations = True
-  
+
   def _create_user(self, username, email, password, **extra_fields):
     if not email:
       raise ValueError('The given email must be set')
-    
+
     email = self.normalize_email(email)
     username = self.model.normalize_username(username)
     user = self.model(username=username, email=email, **extra_fields)
     user.set_password(password)
     user.save(using=self.db)
     return user
-  
+
   def create_user(self, username, email, password, **extra_fields):
     extra_fields.setdefault('is_staff', False)
     extra_fields.setdefault('is_superuser', False)
@@ -46,9 +46,9 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
   # check invalid text
   username_validator = UnicodeUsernameValidator()
-  
+
   username = models.CharField(
-    _("username"), max_length=255, 
+    _("username"), max_length=255,
     validators=[username_validator],
   )
   email = models.EmailField(
@@ -60,21 +60,21 @@ class User(AbstractBaseUser, PermissionsMixin):
   is_staff = models.BooleanField(_('staff status'), default=False,)
   is_active = models.BooleanField(default=True)
   created_at = models.DateField(auto_now_add=True)
-  
+
   objects = UserManager()
-  
+
   EMAIL_FIELD = "email"
   USERNAME_FIELD = "email"
   REQUIRED_FIELDS = ["username"]
-  
+
   class Meta:
     verbose_name = _("user")
     verbose_name_plural = _("users")
-  
+
   def clean(self):
     super().clean()
     self.email = self.__class__.objects.normalize_email(self.email)
-  
+
   def email_user(self, subject, message, from_email=None, **kwargs):
     send_mail(subject, message, from_email, [self.email], **kwargs)
 
@@ -82,7 +82,7 @@ class Message(models.Model):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
   Message = models.TextField(max_length=10000)
   created_at = models.DateTimeField(auto_now_add=True)
-  
+
   def __str__(self):
     return self.Message
 
@@ -91,7 +91,7 @@ class PasswordGroup(models.Model):
   group_name = models.CharField(max_length=255)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
-  
+
   class Meta :
     constraints = [
       models.UniqueConstraint(
@@ -99,12 +99,12 @@ class PasswordGroup(models.Model):
         name="group_unique"
       )
     ]
-  
-  # Do not input other 
+
+  # Do not input other
   # def clean(self):
   #   if self.group_name.lower() == "other":
   #     raise ValidationError("group_name cannot be 'other'")
-  
+
   def __str__(self):
     return self.group_name
 
@@ -131,7 +131,7 @@ class PasswordCustomField(models.Model):
   custom_value = models.TextField(max_length=255)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
-  
+
   def __str__(self):
     return self.custom_name
 
@@ -147,7 +147,7 @@ class PasswordManage(models.Model):
   group = models.ForeignKey(PasswordGroup, null=True, on_delete=models.CASCADE)
   custom = models.ManyToManyField(PasswordCustomField, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
-  
+
   class Meta :
     constraints = [
       models.UniqueConstraint(
@@ -155,7 +155,7 @@ class PasswordManage(models.Model):
         name="index_unique"
       )
     ]
-  
+
   def __str__(self):
     return self.title
 
@@ -164,7 +164,7 @@ class Task(models.Model):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
   task = models.TextField(max_length=255)
   created_at = models.DateTimeField(auto_now_add=True)
-  
+
   def __str__(self):
     return self.task
 
@@ -176,15 +176,15 @@ class Calendar(models.Model):
   all_day = models.BooleanField(default=False)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
-  
+
   def __str__(self):
     return self.title
-  
+
 class InquiryCategory(models.Model):
     category_name = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return self.category_name
 
@@ -206,6 +206,6 @@ class Inquiry(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return f"{self.inquiry_content[:50]}..."

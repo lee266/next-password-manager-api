@@ -9,6 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
     extra_kwargs = {'password': {'write_only': True, 'required': True},
                     'email': {'write_only': True, 'required': True}
                     }
+
     
   def create(self, validated_data):
     user = User.objects.create_user(**validated_data)
@@ -22,7 +23,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
 class PasswordCustomFieldSerializer(serializers.ModelSerializer):
   created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
-  
+
   class Meta:
     model = PasswordCustomField
     fields = '__all__'
@@ -30,7 +31,7 @@ class PasswordCustomFieldSerializer(serializers.ModelSerializer):
 
 class PasswordGroupSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
-    
+
     class Meta:
         model = PasswordGroup
         fields = '__all__'
@@ -38,7 +39,7 @@ class PasswordGroupSerializer(serializers.ModelSerializer):
 
 class PasswordTagSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
-    
+
     class Meta:
         model = PasswordTag
         fields = '__all__'
@@ -48,14 +49,14 @@ class PasswordManageSerializer(serializers.ModelSerializer):
   group = PasswordGroupSerializer(read_only=True)
   tag = PasswordTagSerializer(read_only=True)
   custom = PasswordCustomFieldSerializer(many=True, read_only=True)
-  
+
   class Meta:
     model = PasswordManage
     fields = '__all__'
 
 class InquiryCategorySerializer(serializers.ModelSerializer):
   created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
-  
+
   class Meta:
     model = InquiryCategory
     fields = '__all__'
@@ -63,14 +64,14 @@ class InquiryCategorySerializer(serializers.ModelSerializer):
 class InquirySerializer(serializers.ModelSerializer):
   created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
   Inquiry_category = InquiryCategorySerializer(read_only=True)
-  
+
   class Meta:
     model = Inquiry
     fields = '__all__'
 
 class TaskSerializer(serializers.ModelSerializer):
   created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
-  
+
   class Meta:
     model = Task
     fields = '__all__'
@@ -80,8 +81,3 @@ class CalendarSerializer(serializers.ModelSerializer):
     model = Calendar
     fields = '__all__'
     read_only_fields = ('id',)
-    
-
-    
-  
-    
