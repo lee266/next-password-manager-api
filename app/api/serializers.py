@@ -10,7 +10,9 @@ class UserSerializer(serializers.ModelSerializer):
                     'email': {'write_only': True, 'required': True}
                     }
 
-    
+  def validate(self, data):
+    return super().validate(data)
+
   def create(self, validated_data):
     user = User.objects.create_user(**validated_data)
     return user
