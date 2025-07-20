@@ -41,6 +41,7 @@ if RENDER_EXTERNAL_HOSTNAME:
 ALLOWED_HOSTS += [
     "django",
     "next-password-manager-app.vercel.app",
+    "password-manager-api.rito-dev.com",
 ]
 
 if DEVELOP:
@@ -82,6 +83,7 @@ MIDDLEWARE = [
 # CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = [
     "https://next-password-manager-app.vercel.app",
+    "https://password-manager-api.rito-dev.com",
 ]
 
 if DEVELOP:
