@@ -19,7 +19,7 @@ class EmailManager(BaseEmailMessage):
 
 class ActivationEmail(EmailManager):
     template_name = 'accounts/activation.html'
-    
+
     def get_context_data(self):
       context = super().get_context_data()
       user = context.get("user")
@@ -32,7 +32,7 @@ class ActivationEmail(EmailManager):
 
 class PasswordResetEmail(BaseEmailMessage):
     template_name = 'accounts/password_reset.html'
-    
+
     def get_context_data(self):
       context = super().get_context_data()
       user = context.get("user")
@@ -45,7 +45,7 @@ class PasswordResetEmail(BaseEmailMessage):
 
 class PasswordChangedConfirmationEmail(BaseEmailMessage):
     template_name = 'accounts/password_changed_confirmation.html'
-    
+
     def get_context_data(self):
       context = super().get_context_data()
       return context

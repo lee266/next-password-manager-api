@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED 1
 RUN mkdir /usr/src/api
 
 WORKDIR /usr/src/api
-ADD ./api /usr/src/api/
+ADD ./ /usr/src/api/
 
 # ADD ./api/requirements.txt /usr/src/api/
 EXPOSE 8000

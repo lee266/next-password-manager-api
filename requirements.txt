@@ -6,7 +6,8 @@ psycopg2-binary>=2.8
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
 django-cors-headers
-djoser>==2.1.0
+django-templated-mail
+djoser>=2.1.0
 mysqlclient
 PyJWT
 whitenoise
