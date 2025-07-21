@@ -8,3 +8,4 @@ terraform.tfvars
 *.tfstate
 *.tfstate.*
 .terraform/
+terraform/**/lambda.zip
