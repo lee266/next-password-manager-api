@@ -92,6 +92,11 @@ if DEVELOP:
         "http://127.0.0.1:3000",
     ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://password-manager-api.rito-dev.com",
+    "https://next-password-manager-app.vercel.app",
+]
+
 CORS_ALLOW_CREDENTIALS = True
 WHITENOISE_ALLOW_ALL_ORIGINS = True
 
