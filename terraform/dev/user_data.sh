@@ -31,8 +31,8 @@ sudo cp .env.example .env
 export $(grep CERTBOT_EMAIL .env | xargs)
 
 # certbot requires a domain name to issue a certificate
-sudo certbot certonly --standalone -d password-manager-api.rito-dev.com --email "$CERTBOT_EMAIL" --agree-tos --non-interactive
-sudo cp -r /etc/letsencrypt/archive/password-manager-api.rito-dev.com/ ./docker/nginx/config/
+# sudo certbot certonly --standalone -d password-manager-api.rito-dev.com --email "$CERTBOT_EMAIL" --agree-tos --non-interactive
+# sudo cp -r /etc/letsencrypt/archive/password-manager-api.rito-dev.com/ ./docker/nginx/config/
 
 # start docker compose
 # docker-compose up -d --build
