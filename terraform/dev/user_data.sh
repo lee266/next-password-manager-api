@@ -27,7 +27,7 @@ sudo amazon-linux-extras install epel
 sudo yum install -y certbot
 
 # Load environment variables
-cp .env.example .env
+sudo cp .env.example .env
 export $(grep CERTBOT_EMAIL .env | xargs)
 
 # certbot requires a domain name to issue a certificate
