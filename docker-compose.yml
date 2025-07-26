@@ -33,7 +33,7 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
       TZ: "Asia/Tokyo"
     ports:
-      - ":3306"
+      - "3306:3306"
   nginx:
     build:
       context: ./docker/nginx
