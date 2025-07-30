@@ -59,3 +59,68 @@ variable "stop_schedule" {
   type        = string
   default     = "cron(0 13 * * ? *)" # UTC 13:00 (JST 22:00)
 }
+
+# Database secrets variables
+variable "db_root_password" {
+  description = "Database root password"
+  type        = string
+  sensitive   = true
+  default     = "password"
+}
+
+variable "db_name" {
+  description = "Database name"
+  type        = string
+  default     = "password_manager"
+}
+
+# Additional SSM Parameters for app configuration
+resource "aws_ssm_parameter" "certbot_email" {
+  name  = "/password-manager/app/certbot-email"
+  type  = "String"
+  value = var.certbot_email
+
+  tags = {
+    Name = "password-manager-certbot-email"
+  }
+}
+
+resource "aws_ssm_parameter" "domain_name" {
+  name  = "/password-manager/app/domain-name"
+  type  = "String"
+  value = var.domain_name
+
+  tags = {
+    Name = "password-manager-domain-name"
+  }
+}
+
+resource "aws_ssm_parameter" "db_host" {
+  name  = "/password-manager/app/db-host"
+  type  = "String"
+  value = aws_instance.db.private_ip
+
+  tags = {
+    Name = "password-manager-db-host"
+  }
+}
+
+# Additional variables
+variable "certbot_email" {
+  description = "Email for Let's Encrypt certificates"
+  type        = string
+  default     = "your-email@example.com"
+}
+
+variable "domain_name" {
+  description = "Domain name for the application"
+  type        = string
+  default     = "password-manager-api.rito-dev.com"
+}
+
+variable "email_host_password" {
+  description = "Email host password for application"
+  type        = string
+  sensitive   = true
+  default     = "your-email-host-password"
+}

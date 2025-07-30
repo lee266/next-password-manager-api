@@ -79,3 +79,61 @@ resource "aws_vpc_endpoint" "s3" {
   }
 }
 
+# -- AWS Sytem Manager (SSM) --
+
+
+# VPC Endpoint for Systems Manager (Parameter Store)
+resource "aws_vpc_endpoint" "ssm" {
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.${var.aws_region}.ssm"
+  vpc_endpoint_type   = "Interface"
+
+  subnet_ids         = [for subnet in aws_subnet.private : subnet.id]
+  security_group_ids = [aws_security_group.vpc_endpoint_sg.id]
+
+  private_dns_enabled = true
+
+  tags = {
+    Name = "ssm-vpc-endpoint"
+  }
+}
+
+# VPC Endpoint for Systems Manager Messages (必要な場合)
+resource "aws_vpc_endpoint" "ssm_messages" {
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.${var.aws_region}.ssmmessages"
+  vpc_endpoint_type   = "Interface"
+
+  subnet_ids         = [for subnet in aws_subnet.private : subnet.id]
+  security_group_ids = [aws_security_group.vpc_endpoint_sg.id]
+
+  private_dns_enabled = true
+
+  tags = {
+    Name = "ssm-messages-vpc-endpoint"
+  }
+}
+
+# VPC Endpoint用のセキュリティグループ
+resource "aws_security_group" "vpc_endpoint_sg" {
+  name_prefix = "vpc-endpoint-sg"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.main.cidr_block]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "vpc-endpoint-security-group"
+  }
+}

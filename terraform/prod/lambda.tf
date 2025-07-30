@@ -37,7 +37,7 @@ resource "aws_iam_role_policy" "lambda_ec2_policy" {
           "ec2:StopInstances"
         ],
         Effect   = "Allow",
-        Resource = "arn:aws:ec2:*:*:instance/*"
+        Resource = "*"
       },
       {
         Action = [
@@ -60,19 +60,16 @@ resource "aws_lambda_function" "ec2_controller" {
   runtime          = "python3.13"
   source_code_hash = filebase64sha256(data.archive_file.lambda_zip.output_path)
   timeout          = 60
-  region           = var.aws_region
 }
 
 resource "aws_cloudwatch_event_rule" "start_ec2" {
   name                = "start-ec2"
   schedule_expression = var.start_schedule
-  region              = var.aws_region
 }
 
 resource "aws_cloudwatch_event_rule" "stop_ec2" {
   name                = "stop-ec2"
   schedule_expression = var.stop_schedule
-  region              = var.aws_region
 }
 
 resource "aws_cloudwatch_event_target" "start_target" {
@@ -93,7 +90,6 @@ resource "aws_lambda_permission" "allow_eventbridge_start" {
   function_name = aws_lambda_function.ec2_controller.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.start_ec2.arn
-  region        = var.aws_region
 }
 
 resource "aws_lambda_permission" "allow_eventbridge_stop" {
@@ -102,5 +98,4 @@ resource "aws_lambda_permission" "allow_eventbridge_stop" {
   function_name = aws_lambda_function.ec2_controller.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.stop_ec2.arn
-  region       = var.aws_region
 }
