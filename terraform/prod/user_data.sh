@@ -150,6 +150,10 @@ sudo systemctl start certbot-renew.timer
 echo "Starting application..."
 sudo systemctl start password-manager-app.service
 
+docker-compose exec django bash -c "python manage.py migrate && python manage.py superuser"
+
+sudo systemctl restart password-manager-app.service
+
 # 起動確認
 sleep 30
 if docker-compose -f docker-compose-production.yml ps | grep -q "Up"; then
@@ -159,6 +163,7 @@ else
     echo "Application may have failed to start"
     docker-compose -f docker-compose-production.yml logs
 fi
+
 
 # ログ出力
 echo "Application setup completed at $(date)" >> /var/log/app-setup.log
