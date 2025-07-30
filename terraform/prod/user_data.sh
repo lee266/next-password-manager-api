@@ -51,7 +51,6 @@ sudo git config --global --add safe.directory /home/ec2-user/app
 
 # Checkout to issue branch
 sudo git fetch origin || echo "Git fetch failed, continuing..."
-sudo git switch -c issue-31 origin/issue-31 || sudo git checkout issue-31 || echo "Branch checkout failed, using current branch"
 
 # Install Certbot
 dnf install -y epel-release
@@ -163,7 +162,6 @@ else
     echo "Application may have failed to start"
     docker-compose -f docker-compose-production.yml logs
 fi
-
 
 # ログ出力
 echo "Application setup completed at $(date)" >> /var/log/app-setup.log
