@@ -1,35 +1,50 @@
 #!/bin/bash
 
-yum update -y
-yum install -y git curl unzip
+set -euxo pipefail
 
-# install docker
-amazon-linux-extras install docker -y
-systemctl start docker
-systemctl enable docker
-usermod -aG docker ec2-user
+# Update packages
+sudo dnf update -y
 
-# install docker compose
+# Install common tools
+# sudo dnf swap libcurl-minimal libcurl-full
+sudo dnf install -y git vim
+
+# Install docker
+sudo dnf install -y docker
+sudo systemctl enable --now docker
+sudo usermod -aG docker ec2-user
+
+# Install docker compose
 sudo curl -L "https://github.com/docker/compose/releases/download/v2.38.2/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose || true
 
-# consturuct app directory
+# Clone the app repository
 cd /home/ec2-user
 git clone https://github.com/lee266/next-password-manager-api.git app
 cd app
+chown -R ec2-user:ec2-user /home/ec2-user/app
 
-git config --global --add safe.directory /home/ec2-user/app
+# Configure Git safe directory
+sudo git config --global --add safe.directory /home/ec2-user/app
 
-git switch -c issue-28 origin/issue-28
-# docker compose up -d --build
+# Checkout to issue branch
+sudo git switch -c issue-31 origin/issue-31
 
-sudo amazon-linux-extras install epel
-sudo yum install -y certbot
+# Install Certbot
 
-# certbot requires a domain name to issue a certificate
-# sudo certbot certonly --standalone -d password-manager-api.rito-dev.com
-sudo cp -r /etc/letsencrypt/archive/password-manager-api.rito-dev.com/ ./docker/nginx/config/
+sudo dnf install -y epel-release
+sudo dnf install -y certbot
 
-# start docker compose
-docker-compose up -d --build
+# Load environment variables
+sudo cp .env.example .env
+export $(grep CERTBOT_EMAIL .env | xargs)
+
+# Issue SSL certificate
+# sudo certbot certonly --standalone -d password-manager-api.rito-dev.com --email "$CERTBOT_EMAIL" --agree-tos --non-interactive
+
+# Copy SSL certificates into app
+# sudo cp -r /etc/letsencrypt/archive/password-manager-api.rito-dev.com/ ./docker/nginx/config/
+
+# Start application (you can uncomment after verifying)
+# docker-compose up -d --build
