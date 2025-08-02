@@ -21,8 +21,6 @@ cd app
 
 git config --global --add safe.directory /home/ec2-user/app
 
-git switch -c issue-31 origin/issue-31
-
 sudo amazon-linux-extras install epel
 sudo yum install -y certbot
 
