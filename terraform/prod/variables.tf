@@ -1,3 +1,9 @@
+variable "aws_profile" {
+  description = "AWS CLI profile to use"
+  type        = string
+  default     = "default"
+}
+
 variable "aws_region" {
   description = "AWS region"
   type        = string
@@ -7,15 +13,114 @@ variable "aws_region" {
 variable "instance_type" {
   description = "Instance type"
   type        = string
+  default     = "t3.micro"
 }
 
-variable "ssh_port" {
-  description = "SSH port"
-  type        = number
-  default     = 22
-}
-
-variable "key_name" {
-  description = "Name of the SSH key pair to use for the instance"
+variable "db_instance_type" {
+  description = "Database instance type"
   type        = string
+  default     = "t3.micro"
+}
+
+variable "allowed_ssh_cidr_blocks" {
+  description = "List of CIDR blocks allowed to SSH"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "ec2_key_name" {
+  description = "Key pair name for EC2 instances"
+  type        = string
+  default     = "password-manager-ec2"
+}
+
+# VPC/Subnet variables
+variable "availability_zones" {
+  description = "List of availability zones to use"
+  type        = list(string)
+  default     = ["ap-northeast-1a", "ap-northeast-1c"]
+}
+
+variable "vpc_cidr" {
+  description = "CIDR block for VPC"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+# Auto Start/Stop Schedule variables
+variable "start_schedule" {
+  description = "Cron expression for starting instances"
+  type        = string
+  default     = "cron(0 1 * * ? *)" # UTC 01:00 (JST 10:00)
+}
+
+variable "stop_schedule" {
+  description = "Cron expression for stopping instances"
+  type        = string
+  default     = "cron(0 13 * * ? *)" # UTC 13:00 (JST 22:00)
+}
+
+# Database secrets variables
+variable "db_root_password" {
+  description = "Database root password"
+  type        = string
+  sensitive   = true
+  default     = "password"
+}
+
+variable "db_name" {
+  description = "Database name"
+  type        = string
+  default     = "password_manager"
+}
+
+# Additional SSM Parameters for app configuration
+resource "aws_ssm_parameter" "certbot_email" {
+  name  = "/password-manager/app/certbot-email"
+  type  = "String"
+  value = var.certbot_email
+
+  tags = {
+    Name = "password-manager-certbot-email"
+  }
+}
+
+resource "aws_ssm_parameter" "domain_name" {
+  name  = "/password-manager/app/domain-name"
+  type  = "String"
+  value = var.domain_name
+
+  tags = {
+    Name = "password-manager-domain-name"
+  }
+}
+
+resource "aws_ssm_parameter" "db_host" {
+  name  = "/password-manager/app/db-host"
+  type  = "String"
+  value = aws_instance.db.private_ip
+
+  tags = {
+    Name = "password-manager-db-host"
+  }
+}
+
+# Additional variables
+variable "certbot_email" {
+  description = "Email for Let's Encrypt certificates"
+  type        = string
+  default     = "your-email@example.com"
+}
+
+variable "domain_name" {
+  description = "Domain name for the application"
+  type        = string
+  default     = "password-manager-api.rito-dev.com"
+}
+
+variable "email_host_password" {
+  description = "Email host password for application"
+  type        = string
+  sensitive   = true
+  default     = "your-email-host-password"
 }

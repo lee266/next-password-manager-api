@@ -12,28 +12,7 @@ services:
     ports:
       - "8000:8000"
     tty: true
-    depends_on:
-      - database
 
-  database:
-    build:
-      context: ./docker/mysql
-      dockerfile: Dockerfile
-    container_name: password_database
-    volumes:
-      - mysql:/var/lib/mysql
-    environment:
-      # this variable is mandatory. this is the root user password
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      # name of a database
-      MYSQL_DATABASE: mydb
-      # create new user
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
-      TZ: "Asia/Tokyo"
-    ports:
-      - "3306:3306"
   nginx:
     build:
       context: ./docker/nginx
